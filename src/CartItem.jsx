@@ -7,39 +7,34 @@ const CartItem = ({ onContinueShopping }) => {
   const cart = useSelector((state) => state.cart.items);
   const dispatch = useDispatch();
 
-  /**
-   * Calculates the total cost of all items in the cart.
-   * (Sum of cost * quantity for each item)
-   */
+  // Calculates the total cost of all items in the cart.
   const calculateTotalAmount = () => {
     if (!cart || cart.length === 0) return 0;
+
     return cart
-      .reduce((acc, item) => acc + parseFloat(item.cost) * item.quantity, 0)
+      .reduce((acc, item) => {
+        // Strip out any non-numeric characters (like "$")
+        const numericCost = parseFloat(item.cost.replace(/[^\d.]/g, '')) || 0;
+        return acc + numericCost * item.quantity;
+      }, 0)
       .toFixed(2);
   };
 
-  /**
-   * Calculates the subtotal for a single item:
-   * (item.cost * item.quantity)
-   */
+  // Calculates the subtotal for a single item: (cost * quantity)
   const calculateTotalCost = (item) => {
-    const cost = parseFloat(item.cost);
-    return (cost * item.quantity).toFixed(2);
+    // Strip out any non-numeric characters (like "$")
+    const numericCost = parseFloat(item.cost.replace(/[^\d.]/g, '')) || 0;
+    return (numericCost * item.quantity).toFixed(2);
   };
 
-  /**
-   * Allows user to go back to the listing page to continue shopping.
-   * This calls the callback function passed from the parent component.
-   */
+  // Allows user to go back to the listing page to continue shopping.
   const handleContinueShopping = () => {
     if (onContinueShopping) {
       onContinueShopping();
     }
   };
 
-  /**
-   * Increments the quantity of the specified item by dispatching `updateQuantity`.
-   */
+  // Increments item quantity
   const handleIncrement = (item) => {
     dispatch(
       updateQuantity({
@@ -49,10 +44,7 @@ const CartItem = ({ onContinueShopping }) => {
     );
   };
 
-  /**
-   * Decrements the quantity of the specified item. 
-   * If quantity drops to 0, remove the item from the cart.
-   */
+  // Decrements item quantity (remove if 0)
   const handleDecrement = (item) => {
     if (item.quantity > 1) {
       dispatch(
@@ -66,32 +58,33 @@ const CartItem = ({ onContinueShopping }) => {
     }
   };
 
-  /**
-   * Removes the item from the cart altogether.
-   */
+  // Removes item from cart
   const handleRemove = (item) => {
     dispatch(removeItem(item.name));
   };
 
-  /**
-   * (Optional) For future checkout functionality,
-   * right now it just alerts the user.
-   */
+  // (Optional) checkout placeholder
   const handleCheckoutShopping = () => {
     alert('Functionality to be added for future reference');
   };
 
   return (
     <div className="cart-container">
-      <h2 style={{ color: 'black' }}>Total Cart Amount: ${calculateTotalAmount()}</h2>
+      <h2 style={{ color: 'black' }}>
+        Total Cart Amount: ${calculateTotalAmount()}
+      </h2>
 
       <div>
         {cart.map((item) => (
           <div className="cart-item" key={item.name}>
             <img className="cart-item-image" src={item.image} alt={item.name} />
             <div className="cart-item-details">
+              {/* Show the item name */}
               <div className="cart-item-name">{item.name}</div>
-              <div className="cart-item-cost">${item.cost}</div>
+
+              {/* Use item.cost directly in the UI since it already has a "$" */}
+              <div className="cart-item-cost">{item.cost}</div>
+
               <div className="cart-item-quantity">
                 <button
                   className="cart-item-button cart-item-button-dec"
@@ -107,9 +100,11 @@ const CartItem = ({ onContinueShopping }) => {
                   +
                 </button>
               </div>
+
               <div className="cart-item-total">
                 Total: ${calculateTotalCost(item)}
               </div>
+
               <button
                 className="cart-item-delete"
                 onClick={() => handleRemove(item)}
