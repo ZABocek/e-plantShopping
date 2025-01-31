@@ -12,15 +12,15 @@ function ProductList() {
   const [showCart, setShowCart] = useState(false);
   const [showPlants, setShowPlants] = useState(false);
   const [addedToCart, setAddedToCart] = useState({});
-    const handleAddToCart = (product) => {
-        dispatch(addItem(product));
-        setAddedToCart((prevState) => ({
-            ...prevState,
-            [product.name]: true,
-        }));
-    };
+  const handleAddToCart = (product) => {
+    dispatch(addItem(product));
+    setAddedToCart((prevState) => ({
+      ...prevState,
+      [product.name]: true,
+    }));
+  };
 
-};
+
     const plantsArray = [
         {
             category: "Air Purifying Plants",
@@ -317,6 +317,6 @@ const handlePlantsClick = (e) => {
             )}
         </div>
                 );
-            
+            }           
 
 export default ProductList;
